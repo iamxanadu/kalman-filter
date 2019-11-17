@@ -38,3 +38,5 @@
 !.vscode/extensions.json
 *.code-workspace
 .vscode/settings.json
+
+build/*
