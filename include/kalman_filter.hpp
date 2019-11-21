@@ -7,31 +7,32 @@ using namespace Eigen;
 
 class LinearKalmanFilter {
 
-    /**
-     * @brief Construct a new Linear Kalman Filter object and set the initial state of the filter later
-     * 
-     * @param A State transition matrix
-     * @param B Input to state change matrix
-     * @param C States to measurements matrix
-     * @param D Inputs to measurements matrix
-     * @param Q Process noise covariance
-     * @param R Measurement noise covariance
-     */
+  /**
+   * @brief Construct a new Linear Kalman Filter object and set the initial
+   * state of the filter later
+   *
+   * @param A State transition matrix
+   * @param B Input to state change matrix
+   * @param C States to measurements matrix
+   * @param D Inputs to measurements matrix
+   * @param Q Process noise covariance
+   * @param R Measurement noise covariance
+   */
   LinearKalmanFilter(const MatrixXf &A, const MatrixXf &B, const MatrixXf &C,
                      const MatrixXf &D, const MatrixXf &Q, const MatrixXf &R);
 
-    /**
-     * @brief Construct a new Linear Kalman Filter object
-     * 
-     * @param A State transition matrix
-     * @param B Input to state change matrix
-     * @param C States to measurements matrix
-     * @param D Inputs to measurements matrix
-     * @param Q Process noise covariance
-     * @param R Measurement noise covariance
-     * @param x_hat Initial state esitmate
-     * @param P_hat Initial covariance estimate
-     */
+  /**
+   * @brief Construct a new Linear Kalman Filter object
+   *
+   * @param A State transition matrix
+   * @param B Input to state change matrix
+   * @param C States to measurements matrix
+   * @param D Inputs to measurements matrix
+   * @param Q Process noise covariance
+   * @param R Measurement noise covariance
+   * @param x_hat Initial state esitmate
+   * @param P_hat Initial covariance estimate
+   */
   LinearKalmanFilter(const MatrixXf &A, const MatrixXf &B, const MatrixXf &C,
                      const MatrixXf &D, const MatrixXf &Q, const MatrixXf &R,
                      const VectorXf &x_hat, const MatrixXf &P_hat);
@@ -39,7 +40,6 @@ class LinearKalmanFilter {
   ~LinearKalmanFilter();
 
 public:
-
   /**
    * @brief Computes one step of the Kalman filter and updates P_hat and x_hat
    *
@@ -107,4 +107,33 @@ private:
   MatrixXf P_hat;
 
   int n, m, p;
+};
+
+class ExtendedKalmanFilter {
+
+  ExtendedKalmanFilter(std::function<VectorXf(VectorXf, VectorXf, float)> f,
+                       std::function<VectorXf(VectorXf, float)> h,
+                       std::function<MatrixXf(VectorXf, VectorXf, float)> F,
+                       std::function<MatrixXf(VectorXf, float)> H,
+                       const MatrixXf &Q, const MatrixXf &R, const VectorXf &ix_hat, const MatrixXf &iP_hat);
+
+  ~ExtendedKalmanFilter();
+
+public:
+  void step(VectorXf u, VectorXf z, float dt);
+
+private:
+  void predict(VectorXf u, float dt);
+  void update(VectorXf z, float dt);
+
+  std::function<VectorXf(VectorXf, VectorXf, float)> f;
+  std::function<VectorXf(VectorXf, float)> h;
+  std::function<MatrixXf(VectorXf, VectorXf, float)> F;
+  std::function<MatrixXf(VectorXf, float)> H;
+
+  VectorXf x_hat;
+  MatrixXf P_hat;
+
+  MatrixXf Q;
+  MatrixXf R;
 };
